@@ -61,12 +61,20 @@
     </div>
 
     <script>
-        let tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [
-            { id: 1, title: 'OCR 截圖解析', desc: '自動識別 Setup', status: 'backlog' },
-            { id: 2, title: 'DeepSeek 雙腦配置', desc: '整合 Gemini 與 DeepSeek V3', status: 'done' }
-        ];
+        let tasks = [];
 
-        function renderTasks() {
+        async function fetchTasks() {
+            try {
+                // 強制尋找 8080 埠的 API
+                const res = await fetch('http://' + window.location.hostname + ':8080/api/tasks');
+                const serverTasks = await res.json();
+                tasks = serverTasks;
+                renderTasks();
+            } catch (e) {
+                console.log("Fetch failed", e);
+                renderTasks();
+            }
+        }
             ['backlog', 'todo', 'inprogress', 'done'].forEach(id => document.getElementById(id).innerHTML = '');
             tasks.forEach(t => {
                 const card = document.createElement('div');
