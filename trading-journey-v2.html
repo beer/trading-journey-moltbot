@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beer's Trading Journey V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(10px); }
+        .custom-checkbox:checked { background-color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-[#0b0e11] text-gray-200 font-sans leading-relaxed">
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col">
+            <div class="p-6 border-b border-gray-800">
+                <h1 class="text-xl font-bold text-blue-400 flex items-center">
+                    <span class="bg-blue-500 text-white p-1 rounded mr-2 text-xs">AL</span> Aliple Trade
+                </h1>
+            </div>
+            <nav class="flex-1 mt-4">
+                <a href="#" class="flex items-center px-6 py-3 bg-blue-600/10 border-l-4 border-blue-500 text-blue-400"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-book-open mr-3"></i> Journal</a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-vial mr-3"></i> Playbook</a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-history mr-3"></i> Replay</a>
+            </nav>
+            <div class="p-4 border-t border-gray-800">
+                <div class="bg-gray-800/50 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Your Zella Score</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xl font-bold text-blue-400">38.25</span>
+                        <i class="fas fa-chart-line text-blue-500/50"></i>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Top Header -->
+            <header class="h-16 bg-[#161a1e] border-b border-gray-800 flex items-center justify-between px-8 sticky top-0 z-10">
+                <div class="flex space-x-8">
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Net P/L</p>
+                        <p class="text-lg font-bold text-green-400">$7,588.74</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Win %</p>
+                        <p class="text-lg font-bold">40.44%</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Profit Factor</p>
+                        <p class="text-lg font-bold text-blue-400">1.02</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-1.5 rounded-full text-sm font-medium transition">Start My Day</button>
+                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs">B</div>
+                </div>
+            </header>
+
+            <div class="p-8 space-y-8">
+                <!-- Middle Section: Rules & Current Trade -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Daily Rules Checklist -->
+                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6">
+                        <h3 class="text-sm font-semibold text-gray-400 mb-4 flex items-center">
+                            <i class="fas fa-shield-alt mr-2 text-blue-500"></i> Daily Rules
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
+                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Follow Quiet Hour rules?</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
+                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Avoid trades outside setups?</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
+                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Honor SL without moving it?</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500" checked>
+                                <span class="text-sm text-gray-200 transition">Take less than 3 trades?</span>
+                            </label>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center text-xs">
+                            <span class="text-gray-500">Consistency Score</span>
+                            <span class="text-green-400 font-bold">86%</span>
+                        </div>
+                    </div>
+
+                    <!-- Setup Checklist (Dynamic) -->
+                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6 lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-semibold text-gray-400 flex items-center">
+                                <i class="fas fa-list-check mr-2 text-orange-500"></i> Active Setup: <span class="text-white ml-2 font-bold tracking-tight">PO3 Setup</span>
+                            </h3>
+                            <span class="bg-orange-500/10 text-orange-500 text-[10px] px-2 py-0.5 rounded border border-orange-500/20 uppercase">High Confidence</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-12 gap-y-3">
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
+                                <span class="text-sm">Accumulation</span>
+                            </label>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
+                                <span class="text-sm">HTF FVG</span>
+                            </label>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
+                                <span class="text-sm">Manipulation</span>
+                            </label>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500">
+                                <span class="text-sm">LTF IFVG, CISD</span>
+                            </label>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
+                                <span class="text-sm">Liquidity Sweep</span>
+                            </label>
+                            <label class="flex items-center space-x-3">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500">
+                                <span class="text-sm">SMT Divergence</span>
+                            </label>
+                        </div>
+                        <div class="mt-6 flex items-center bg-gray-900 rounded-full h-1.5 overflow-hidden">
+                            <div class="bg-orange-500 h-full w-[72%]"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2">Checklist Completion: 72%</p>
+                    </div>
+                </div>
+
+                <!-- Calendar and Chart Placeholder -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6">
+                        <h3 class="text-sm font-semibold text-gray-400 mb-6 flex justify-between">
+                            <span>Performance Calendar</span>
+                            <span class="text-xs font-normal">January 2026</span>
+                        </h3>
+                        <!-- Simple Calendar Mockup -->
+                        <div class="grid grid-cols-7 gap-2">
+                            <!-- Loop days (Simplified) -->
+                            <div class="h-10 rounded bg-gray-800/30"></div>
+                            <div class="h-10 rounded bg-gray-800/30"></div>
+                            <div class="h-10 rounded bg-green-900/40 border border-green-500/20 flex items-center justify-center text-[10px] text-green-400">+$340</div>
+                            <div class="h-10 rounded bg-red-900/40 border border-red-500/20 flex items-center justify-center text-[10px] text-red-400">-$120</div>
+                            <div class="h-10 rounded bg-green-900/40 border border-green-500/20 flex items-center justify-center text-[10px] text-green-400">+$540</div>
+                            <div class="h-10 rounded bg-gray-800/30"></div>
+                            <div class="h-10 rounded bg-gray-800/30"></div>
+                            <!-- More days... -->
+                            <div class="h-10 rounded bg-green-500 flex items-center justify-center text-[10px] text-white font-bold">+$1200</div>
+                            <div class="h-10 rounded bg-red-400 flex items-center justify-center text-[10px] text-white font-bold">-$450</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6 flex flex-col justify-center items-center">
+                         <div class="w-48 h-48 bg-gray-800/20 rounded-full border-4 border-dashed border-gray-800 flex items-center justify-center">
+                             <p class="text-xs text-gray-500 italic">Equity Curve Placeholder</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
