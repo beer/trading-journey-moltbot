@@ -5,21 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban - Crazy Money</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .card-bg { background: #161a1e; border: 1px solid #2d333b; border-radius: 12px; }
         body { background: #0b0e11; color: #e2e8f0; font-family: sans-serif; }
         .kanban-col { background: rgba(22, 26, 30, 0.5); min-height: 60vh; border-radius: 12px; padding: 15px; }
-        .kanban-card { background: #1e2329; border: 1px solid #2d333b; padding: 15px; border-radius: 8px; cursor: grab; position: relative; }
-        .ghost-card { opacity: 0.4; background: #3b82f6 !important; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; opacity: 0; transition: opacity 0.2s; }
-        .kanban-card:hover .delete-btn { opacity: 1; }
+        .kanban-card { background: #1e2329; border: 1px solid #2d333b; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
-    <script>if (localStorage.getItem('trade_auth') !== 'authenticated') { window.location.href = 'login.html'; }</script>
-
     <!-- Sidebar -->
     <aside class="w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col">
         <div class="p-6 border-b border-gray-800">
@@ -39,101 +33,19 @@
                     <img src="aliple.jpg" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover">
                     <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#161a1e] rounded-full animate-pulse"></span>
                 </div>
-                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">正在同步資料庫...</p></div>
+                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">系統已切換至最穩模式</p></div>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-8">
-        <header class="mb-10 flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-white">Project Kanban</h2>
-            <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg text-sm font-bold transition shadow-lg">+ New Task</button>
-        </header>
-
+        <header class="mb-10 flex justify-between items-center"><h2 class="text-2xl font-bold text-white">Project Kanban</h2></header>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Backlog</h3><div id="backlog" class="kanban-col space-y-4"></div></div>
-            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">To Do</h3><div id="todo" class="kanban-col space-y-4"></div></div>
-            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">In Progress</h3><div id="inprogress" class="kanban-col space-y-4"></div></div>
-            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Done</h3><div id="done" class="kanban-col space-y-4 opacity-60"></div></div>
+            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Backlog</h3><div class="kanban-col"><div class="kanban-card"><p class="text-sm font-bold">OCR 截圖解析</p></div><div class="kanban-card"><p class="text-sm font-bold">自動短片生成</p></div></div></div>
+            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">To Do</h3><div class="kanban-col"><div class="kanban-card border-l-4 border-blue-500"><p class="text-sm font-bold">TradingView 圖表整合</p></div></div></div>
+            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">In Progress</h3><div class="kanban-col"><div class="kanban-card border-l-4 border-orange-500"><p class="text-sm font-bold">架構標準化整合</p></div><div class="kanban-card border-l-4 border-orange-500"><p class="text-sm font-bold">全站靜態穩定化轉向</p></div></div></div>
+            <div class="flex flex-col"><h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Done</h3><div class="kanban-col opacity-60"><div class="kanban-card"><p class="text-sm font-bold line-through">DeepSeek 雙腦配置</p></div></div></div>
         </div>
     </main>
-
-    <!-- Modal -->
-    <div id="taskModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-        <div class="bg-[#161a1e] p-8 rounded-2xl border border-gray-800 w-full max-w-md shadow-2xl">
-            <h3 class="text-xl font-bold mb-6">新增工作任務</h3>
-            <input type="text" id="taskTitle" placeholder="任務標題" class="w-full bg-[#0b0e11] border border-gray-700 rounded-lg p-3 mb-4 outline-none focus:border-blue-500">
-            <textarea id="taskDesc" placeholder="任務描述" class="w-full bg-[#0b0e11] border border-gray-700 rounded-lg p-3 mb-6 h-32 outline-none focus:border-blue-500"></textarea>
-            <div class="flex justify-end space-x-4">
-                <button onclick="closeModal()" class="text-gray-500 hover:text-white transition">取消</button>
-                <button onclick="addTask()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold">創建</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        async function fetchTasks() {
-            const res = await fetch('/api/tasks');
-            const tasks = await res.json();
-            ['backlog', 'todo', 'inprogress', 'done'].forEach(s => document.getElementById(s).innerHTML = '');
-            tasks.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'kanban-card';
-                card.dataset.id = t.id;
-                card.innerHTML = `
-                    <span class="text-[10px] text-blue-400 font-bold uppercase">${t.priority}</span>
-                    <p class="text-sm font-bold mt-1">${t.title}</p>
-                    <p class="text-[10px] text-gray-500 mt-2">${t.description}</p>
-                    <button onclick="deleteTask(${t.id})" class="delete-btn text-gray-600 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                `;
-                document.getElementById(t.status).appendChild(card);
-            });
-        }
-
-        async function addTask() {
-            const title = document.getElementById('taskTitle').value;
-            const description = document.getElementById('taskDesc').value;
-            if (!title) return;
-            await fetch('/api/tasks', {
-                method: 'POST',
-                body: JSON.stringify({ title, description, status: 'backlog', priority: 'medium' })
-            });
-            closeModal();
-            fetchTasks();
-        }
-
-        async function deleteTask(id) {
-            if (!confirm('確定要刪除此任務嗎？')) return;
-            await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
-            fetchTasks();
-        }
-
-        async function updateStatus(id, status) {
-            await fetch(`/api/tasks/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ status })
-            });
-        }
-
-        function openModal() { document.getElementById('taskModal').classList.replace('hidden', 'flex'); }
-        function closeModal() { document.getElementById('taskModal').classList.replace('flex', 'hidden'); }
-
-        const columns = ['backlog', 'todo', 'inprogress', 'done'];
-        columns.forEach(id => {
-            new Sortable(document.getElementById(id), {
-                group: 'tasks',
-                animation: 150,
-                ghostClass: 'ghost-card',
-                onEnd: async function(evt) {
-                    const taskId = evt.item.dataset.id;
-                    const newStatus = evt.to.id;
-                    await updateStatus(taskId, newStatus);
-                }
-            });
-        });
-
-        window.onload = fetchTasks;
-    </script>
 </body>
 </html>
