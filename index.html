@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beer's Crazy Money Dashboard</title>
+    <title>Beer's Crazy Money - Unified Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 TradingView Lightweight Charts -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script src="data.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,78 +20,52 @@
 <body class="flex flex-col md:flex-row h-screen overflow-hidden">
     <script>if (localStorage.getItem('trade_auth') !== 'authenticated') { window.location.href = 'login.html'; }</script>
 
-    <!-- Mobile Header -->
-    <div class="md:hidden bg-[#161a1e] p-4 flex justify-between items-center border-b border-gray-800">
-        <h1 class="text-xl font-bold text-blue-400">Crazy Money</h1>
-        <button onclick="toggleSidebar()" class="text-white"><i class="fas fa-bars"></i></button>
-    </div>
-
-    <!-- Sidebar (Standard Template) -->
-    <aside id="sidebar" class="sidebar w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col fixed inset-y-0 left-0 md:relative md:translate-x-0">
-        <div class="p-6 border-b border-gray-800 hidden md:block">
-            <h1 class="text-xl font-bold text-blue-400 flex items-center">
-                <span class="bg-blue-500 text-white p-1 rounded mr-2 text-xs">CM</span> Crazy Money
-            </h1>
+    <!-- Sidebar (MOTHER TEMPLATE) -->
+    <div id="sidebar-container"></div><script src="layout.js"></script><aside style="display:none" id="sidebar" class="sidebar w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col fixed inset-y-0 left-0 md:relative md:translate-x-0">
+        <div class="p-6 border-b border-gray-800">
+            <h1 class="text-xl font-bold text-blue-400 flex items-center"><span class="bg-blue-500 text-white p-1 rounded mr-2 text-xs">CM</span> Crazy Money</h1>
         </div>
         <nav class="flex-1 mt-4">
             <a href="index.html" class="flex items-center px-6 py-3 bg-blue-600/10 border-l-4 border-blue-500 text-blue-400"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
-            <a href="project-management.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-tasks mr-3"></i> Kanban</a>
+            <a href="battle-station.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-bolt mr-3"></i> Battle Station</a>
+            <a href="project-management.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-tasks mr-3"></i> Project Kanban</a>
+            <a href="reports.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-file-alt mr-3"></i> AI Reports</a>
         </nav>
         <div class="p-6 border-t border-gray-800">
             <div class="flex items-center space-x-3">
-                <img src="aliple.jpg" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover">
-                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">TradingView 圖表已啟用</p></div>
+                <img src="aliple.jpg" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover shadow-lg shadow-blue-500/20">
+                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">正在守護您的交易...</p></div>
             </div>
         </div>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
+        <!-- Dashboard Content -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-            <div class="card-bg p-4 md:p-6">
-                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Total Net PnL</p>
-                <h2 class="text-xl md:text-2xl font-bold text-green-400" id="dispPnL">$7,588.74</h2>
-            </div>
-            <div class="card-bg p-4 md:p-6">
-                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Status</p>
-                <h2 class="text-xl md:text-2xl font-bold text-blue-400">Trading Live</h2>
-            </div>
+            <div class="card-bg p-6"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Total PnL</p><h2 class="text-xl font-bold text-green-400">$7,588.74</h2></div>
+            <div class="card-bg p-6"><p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Active</p><h2 class="text-xl font-bold text-blue-400">Live</h2></div>
         </div>
-
-        <!-- TradingView Chart Section -->
-        <div class="card-bg p-4 md:p-6 mb-8">
-            <h3 class="text-sm font-bold text-gray-400 mb-6 flex justify-between">
-                <span>Real-time Equity Analysis</span>
-                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">BETA</span>
-            </h3>
+        <div class="card-bg p-6 mb-8">
+            <h3 class="text-sm font-bold text-gray-400 mb-6">Equity Performance (MNQ)</h3>
             <div id="chartContainer" class="w-full" style="height: 400px;"></div>
         </div>
     </main>
 
     <script>
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-
         window.onload = function() {
             if (typeof tradeData !== 'undefined') {
                 const chart = LightweightCharts.createChart(document.getElementById('chartContainer'), {
                     layout: { backgroundColor: '#161a1e', textColor: '#d1d4dc' },
                     grid: { vertLines: { color: '#2d333b' }, horzLines: { color: '#2d333b' } },
-                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
                     priceScale: { borderColor: '#2d333b' },
                     timeScale: { borderColor: '#2d333b' },
                 });
-
-                const lineSeries = chart.addLineSeries({
-                    color: '#3b82f6',
-                    lineWidth: 3,
-                });
-
-                // 數據格式轉換
+                const lineSeries = chart.addLineSeries({ color: '#3b82f6', lineWidth: 3 });
                 const formattedData = tradeData.map(d => ({
                     time: Math.floor(new Date(d.t).getTime() / 1000),
                     value: d.v
                 }));
-                
                 lineSeries.setData(formattedData);
                 chart.timeScale().fitContent();
             }
