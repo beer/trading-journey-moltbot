@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "/home/aliple/.openclaw/workspace/scripts/native_server.py", line 88, in <module>
-    with socketserver.TCPServer(("", PORT), UnifiedHandler) as httpd:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/socketserver.py", line 457, in __init__
-    self.server_bind()
-  File "/usr/lib/python3.12/socketserver.py", line 473, in server_bind
-    self.socket.bind(self.server_address)
-PermissionError: [Errno 13] Permission denied

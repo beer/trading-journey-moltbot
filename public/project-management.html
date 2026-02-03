@@ -83,11 +83,22 @@
     </div>
 
     <script>
-        let tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [
-            { id: 1, title: 'OCR 截圖解析', desc: '自動識別 Setup 狀態', status: 'backlog' },
-            { id: 3, title: 'TradingView 整合', desc: '顯示 K 線圖', status: 'todo' },
-            { id: 5, title: '色彩視覺美化', desc: '階段色彩標註與卡片優化', status: 'inprogress' }
-        ];
+        let tasks = [];
+
+        async function fetchTasks() {
+            try {
+                const res = await fetch('/api/tasks');
+                const serverTasks = await res.json();
+                if (serverTasks.length > 0) {
+                    tasks = serverTasks;
+                }
+                renderTasks();
+            } catch (e) {
+                console.log("Server fetch failed, using local fallback");
+                tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [];
+                renderTasks();
+            }
+        }
 
         function renderTasks() {
             ['backlog', 'todo', 'inprogress', 'done'].forEach(id => document.getElementById(id).innerHTML = '');
