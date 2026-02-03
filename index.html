@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beer's Trading Journey V2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="data.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .glass { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(10px); }
-        .custom-checkbox:checked { background-color: #3b82f6; }
     </style>
 </head>
 <body class="bg-[#0b0e11] text-gray-200 font-sans leading-relaxed">
@@ -18,6 +17,7 @@
             window.location.href = 'login.html';
         }
     </script>
+
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
@@ -43,16 +43,7 @@
                     </div>
                     <div>
                         <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Aliple (阿里婆)</p>
-                        <p class="text-xs text-blue-400 font-medium">正在守護你的交易...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 border-t border-gray-800">
-                <div class="bg-gray-800/50 p-3 rounded-lg">
-                    <p class="text-xs text-gray-500 mb-1">Your Zella Score</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xl font-bold text-blue-400">38.25</span>
-                        <i class="fas fa-chart-line text-blue-500/50"></i>
+                        <p class="text-xs text-blue-400 font-medium">數據守護中...</p>
                     </div>
                 </div>
             </div>
@@ -65,15 +56,11 @@
                 <div class="flex space-x-8">
                     <div class="text-center">
                         <p class="text-[10px] text-gray-500 uppercase tracking-wider">Net P/L</p>
-                        <p class="text-lg font-bold text-green-400">$7,588.74</p>
+                        <p class="text-lg font-bold text-green-400" id="totalPnLDisp">$7,588.74</p>
                     </div>
                     <div class="text-center">
                         <p class="text-[10px] text-gray-500 uppercase tracking-wider">Win %</p>
                         <p class="text-lg font-bold">40.44%</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Profit Factor</p>
-                        <p class="text-lg font-bold text-blue-400">1.02</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -83,135 +70,71 @@
             </header>
 
             <div class="p-8 space-y-8">
-                <!-- Middle Section: Rules & Current Trade -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    <!-- Daily Rules Checklist -->
-                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6">
-                        <h3 class="text-sm font-semibold text-gray-400 mb-4 flex items-center">
-                            <i class="fas fa-shield-alt mr-2 text-blue-500"></i> Daily Rules
-                        </h3>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
-                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Follow Quiet Hour rules?</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
-                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Avoid trades outside setups?</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500">
-                                <span class="text-sm text-gray-400 group-hover:text-gray-200 transition">Honor SL without moving it?</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-blue-500" checked>
-                                <span class="text-sm text-gray-200 transition">Take less than 3 trades?</span>
-                            </label>
-                        </div>
-                        <div class="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center text-xs">
-                            <span class="text-gray-500">Consistency Score</span>
-                            <span class="text-green-400 font-bold">86%</span>
-                        </div>
-                    </div>
-
-                    <!-- Setup Checklist (Dynamic) -->
-                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6 lg:col-span-2">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-sm font-semibold text-gray-400 flex items-center">
-                                <i class="fas fa-list-check mr-2 text-orange-500"></i> Active Setup: <span class="text-white ml-2 font-bold tracking-tight">PO3 Setup</span>
-                            </h3>
-                            <span class="bg-orange-500/10 text-orange-500 text-[10px] px-2 py-0.5 rounded border border-orange-500/20 uppercase">High Confidence</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-x-12 gap-y-3">
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
-                                <span class="text-sm">Accumulation</span>
-                            </label>
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
-                                <span class="text-sm">HTF FVG</span>
-                            </label>
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
-                                <span class="text-sm">Manipulation</span>
-                            </label>
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500">
-                                <span class="text-sm">LTF IFVG, CISD</span>
-                            </label>
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500" checked>
-                                <span class="text-sm">Liquidity Sweep</span>
-                            </label>
-                            <label class="flex items-center space-x-3">
-                                <input type="checkbox" class="form-checkbox h-4 w-4 bg-gray-800 border-gray-700 rounded text-orange-500">
-                                <span class="text-sm">SMT Divergence</span>
-                            </label>
-                        </div>
-                        <div class="mt-6 flex items-center bg-gray-900 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-orange-500 h-full w-[72%]"></div>
-                        </div>
-                        <p class="text-[10px] text-gray-500 mt-2">Checklist Completion: 72%</p>
+                <!-- Middle Section: Trade List -->
+                <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6">
+                    <h3 class="text-sm font-semibold text-gray-400 mb-6 flex justify-between">
+                        <span>Recent Trades Log (MNQ)</span>
+                        <span class="text-xs font-normal text-gray-500">顯示最近 100 筆已平倉交易</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-[10px] text-gray-500 border-b border-gray-800 uppercase tracking-wider">
+                                <tr>
+                                    <th class="pb-3 px-2">Date/Time</th>
+                                    <th class="pb-3">Symbol</th>
+                                    <th class="pb-3">Type</th>
+                                    <th class="pb-3">Entry</th>
+                                    <th class="pb-3">Exit</th>
+                                    <th class="pb-3">Net PnL</th>
+                                    <th class="pb-3 text-right">Zella Scale</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tradeBody" class="text-xs">
+                                <!-- Dynamic rows via data.js -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <!-- Calendar and Chart Section -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <!-- Trade List (Added) -->
-                    <div class="bg-[#161a1e] rounded-xl border border-gray-800 p-6 xl:col-span-2">
-                        <h3 class="text-sm font-semibold text-gray-400 mb-6 flex justify-between">
-                            <span>Recent Trades Log</span>
-                            <span class="text-xs font-normal">Last 100 Trades</span>
-                        </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="text-xs text-gray-500 border-b border-gray-800 uppercase">
-                                    <tr>
-                                        <th class="pb-3 px-2">Date/Time</th>
-                                        <th class="pb-3">Symbol</th>
-                                        <th class="pb-3">Type</th>
-                                        <th class="pb-3">Entry</th>
-                                        <th class="pb-3">Exit</th>
-                                        <th class="pb-3">Net PnL</th>
-                                        <th class="pb-3 text-right">Scale</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tradeBody" class="text-xs">
-                                    <!-- Dynamic rows -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <script>
-                    const body = document.getElementById('tradeBody');
-                    closedTrades.forEach(t => {
-                        const row = document.createElement('tr');
-                        row.className = "border-b border-gray-800/50 hover:bg-gray-800/30 transition";
-                        const pnlColor = t.pnl >= 0 ? 'text-green-400' : 'text-red-400';
-                        const barColor = t.pnl >= 0 ? 'bg-green-500' : 'bg-red-500';
-                        const barWidth = Math.min(Math.abs(t.pnl) / 5, 100); // Simple scale logic
-
-                        row.innerHTML = `
-                            <td class="py-4 px-2 text-gray-400">${t.date}<br><span class="text-[10px]">${t.time}</span></td>
-                            <td class="py-4 font-medium">${t.symbol}</td>
-                            <td class="py-4 ${t.type === 'LONG' ? 'text-blue-400' : 'text-orange-400'}">${t.type}</td>
-                            <td class="py-4 text-gray-300">$${t.entry}</td>
-                            <td class="py-4 text-gray-300">$${t.exit}</td>
-                            <td class="py-4 font-bold ${pnlColor}">${t.pnl >= 0 ? '+$' : '-$'}${Math.abs(t.pnl).toFixed(2)}</td>
-                            <td class="py-4 text-right">
-                                <div class="inline-block w-16 h-1 bg-gray-800 rounded-full overflow-hidden">
-                                    <div class="${barColor} h-full" style="width: ${barWidth}%"></div>
-                                </div>
-                            </td>
-                        `;
-                        body.appendChild(row);
-                    });
-                </script>
             </div>
         </main>
     </div>
+
+    <script>
+        window.onload = function() {
+            const body = document.getElementById('tradeBody');
+            const pnlDisp = document.getElementById('totalPnLDisp');
+            
+            if (typeof totalPnL !== 'undefined') {
+                pnlDisp.textContent = '$' + totalPnL.toLocaleString();
+            }
+
+            if (typeof closedTrades !== 'undefined') {
+                closedTrades.forEach(t => {
+                    const row = document.createElement('tr');
+                    row.className = "border-b border-gray-800/50 hover:bg-gray-800/30 transition";
+                    const pnlColor = t.pnl >= 0 ? 'text-green-400' : 'text-red-400';
+                    const barColor = t.pnl >= 0 ? 'bg-green-500' : 'bg-red-500';
+                    const barWidth = Math.min(Math.abs(t.pnl) / 5, 100);
+
+                    row.innerHTML = `
+                        <td class="py-4 px-2 text-gray-400">${t.date}<br><span class="text-[10px] opacity-50">${t.time}</span></td>
+                        <td class="py-4 font-medium text-gray-300">${t.symbol}</td>
+                        <td class="py-4 font-bold ${t.type === 'LONG' ? 'text-blue-400' : 'text-orange-400'}">${t.type}</td>
+                        <td class="py-4 text-gray-400">$${t.entry.toLocaleString()}</td>
+                        <td class="py-4 text-gray-400">$${t.exit.toLocaleString()}</td>
+                        <td class="py-4 font-bold ${pnlColor}">${t.pnl >= 0 ? '+$' : '-$'}${Math.abs(t.pnl).toFixed(2)}</td>
+                        <td class="py-4 text-right">
+                            <div class="inline-block w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="${barColor} h-full" style="width: ${barWidth}%"></div>
+                            </div>
+                        </td>
+                    `;
+                    body.appendChild(row);
+                });
+            } else {
+                body.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-gray-600 italic">正在載入交易數據...</td></tr>';
+            }
+        }
+    </script>
 </body>
 </html>
