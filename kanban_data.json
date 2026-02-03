@@ -1,0 +1,4 @@
+[
+  { "id": 1, "title": "OCR 截圖解析", "desc": "自動識別 Setup 狀態", "status": "backlog" },
+  { "id": 2, "title": "DeepSeek 雙腦配置", "desc": "整合完成，輔助分析", "status": "done" }
+]
