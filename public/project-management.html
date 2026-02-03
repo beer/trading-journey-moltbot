@@ -83,19 +83,20 @@
     </div>
 
     <script>
-        let tasks = [];
+        let tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [
+            { id: 99, title: '正在連線伺服器...', desc: '請稍候，正在同步您的交易大腦', status: 'backlog' }
+        ];
 
         async function fetchTasks() {
             try {
                 const res = await fetch('/api/tasks');
                 const serverTasks = await res.json();
-                if (serverTasks.length > 0) {
+                if (serverTasks && serverTasks.length > 0) {
                     tasks = serverTasks;
+                    renderTasks();
                 }
-                renderTasks();
             } catch (e) {
-                console.log("Server fetch failed, using local fallback");
-                tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [];
+                console.log("Fetch failed, keeping current tasks.");
                 renderTasks();
             }
         }
