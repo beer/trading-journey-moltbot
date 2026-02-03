@@ -3,118 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beer & Aliple 互動看板</title>
+    <title>Kanban - Crazy Money</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .kanban-column { min-height: 70vh; transition: background 0.3s; }
-        .kanban-column:hover { background: rgba(59, 130, 246, 0.05); }
-        .card { cursor: grab; background: #1e2329; border: 1px solid #2d333b; }
-        .card:active { cursor: grabbing; }
+        .card-bg { background: #161a1e; border: 1px solid #2d333b; border-radius: 12px; }
+        body { background: #0b0e11; color: #e2e8f0; font-family: sans-serif; }
+        .kanban-col { background: rgba(22, 26, 30, 0.5); min-height: 60vh; border-radius: 12px; padding: 15px; }
+        .kanban-card { background: #1e2329; border: 1px solid #2d333b; padding: 15px; border-radius: 8px; cursor: grab; }
         .ghost-card { opacity: 0.4; background: #3b82f6 !important; }
-        body { background: #0b0e11; color: #e2e8f0; }
     </style>
 </head>
-<body class="p-8">
-    <header class="mb-10 flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-blue-400">Trading Journey 協作看板 <span class="text-xs font-normal text-gray-600 ml-2">v1.1 (Draggable)</span></h1>
-            <p class="text-gray-500 mt-2">點擊並拖拽任務卡片來調整優先級或進度</p>
-        </div>
-        <div class="flex space-x-4">
-            <span class="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs border border-green-500/20">阿里婆 正在分析報告...</span>
-            <button onclick="saveState()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs transition"><i class="fas fa-save mr-2"></i>保存排序</button>
-        </div>
-    </header>
+<body class="flex h-screen overflow-hidden">
+    <script>
+        if (localStorage.getItem('trade_auth') !== 'authenticated') {
+            window.location.href = 'login.html';
+        }
+    </script>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Backlog -->
-        <div class="flex flex-col">
-            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
-                <i class="fas fa-lightbulb mr-2 text-yellow-500"></i> BACKLOG
-            </h2>
-            <div id="backlog" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
-                <div class="card p-4 rounded-lg shadow-lg" data-id="ocr">
-                    <span class="text-[10px] text-yellow-500 font-bold uppercase">AI Analysis</span>
-                    <h3 class="text-sm font-medium mt-1">OCR 截圖自動解析</h3>
-                    <p class="text-xs text-gray-500 mt-2">上傳截圖後自動識別 Setup 狀態。</p>
+    <!-- Sidebar (Standardized) -->
+    <aside class="w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col">
+        <div class="p-6 border-b border-gray-800">
+            <h1 class="text-xl font-bold text-blue-400 flex items-center">
+                <span class="bg-blue-500 text-white p-1 rounded mr-2 text-xs">CM</span> Crazy Money
+            </h1>
+        </div>
+        <nav class="flex-1 mt-4">
+            <a href="index.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-th-large mr-3"></i> Dashboard</a>
+            <a href="battle-station.html" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-bolt mr-3"></i> Battle Station</a>
+            <a href="project-management.html" class="flex items-center px-6 py-3 bg-blue-600/10 border-l-4 border-blue-500 text-blue-400"><i class="fas fa-tasks mr-3"></i> Project Kanban</a>
+            <a href="REPORT_JAN_2026.md" class="flex items-center px-6 py-3 text-gray-400 hover:bg-gray-800 transition"><i class="fas fa-file-alt mr-3"></i> AI Reports</a>
+        </nav>
+        <div class="p-6 border-t border-gray-800">
+            <div class="flex items-center space-x-3 bg-blue-500/5 p-3 rounded-xl">
+                <div class="relative">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-xs"><i class="fas fa-user-astronaut"></i></div>
+                    <span class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                 </div>
-                <div class="card p-4 rounded-lg shadow-lg" data-id="video">
-                    <span class="text-[10px] text-purple-500 font-bold uppercase">Video Edit</span>
-                    <h3 class="text-sm font-medium mt-1">自動剪輯精彩交易</h3>
-                    <p class="text-xs text-gray-500 mt-2">將大賺交易生成短影音素材。</p>
+                <div class="text-[10px]">
+                    <p class="text-gray-500 font-bold">ALIPLE</p>
+                    <p class="text-blue-400">正在規劃進度...</p>
                 </div>
             </div>
         </div>
+    </aside>
 
-        <!-- To Do -->
-        <div class="flex flex-col">
-            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
-                <i class="fas fa-list-ul mr-2 text-blue-500"></i> TO DO
-            </h2>
-            <div id="todo" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
-                <div class="card p-4 rounded-lg border-l-4 border-blue-500" data-id="pnl">
-                    <span class="text-[10px] text-blue-400 font-bold uppercase">Data</span>
-                    <h3 class="text-sm font-medium mt-1">精確化 PnL 計算</h3>
-                    <p class="text-xs text-gray-500 mt-2">校準數據至 TradeZella 水平。</p>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <header class="mb-10 flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-white">Project Kanban</h2>
+            <button class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition">New Task</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="flex flex-col">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4 px-2">Backlog</h3>
+                <div id="col-backlog" class="kanban-col space-y-4">
+                    <div class="kanban-card">
+                        <span class="text-[10px] text-yellow-500 font-bold">AI</span>
+                        <p class="text-sm font-bold mt-1">OCR 截圖解析</p>
+                    </div>
+                    <div class="kanban-card">
+                        <span class="text-[10px] text-purple-500 font-bold">VIDEO</span>
+                        <p class="text-sm font-bold mt-1">自動短片生成</p>
+                    </div>
                 </div>
-                <div class="card p-4 rounded-lg shadow-lg" data-id="chart">
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">UI/UX</span>
-                    <h3 class="text-sm font-medium mt-1">整合 TradingView 圖表</h3>
-                    <p class="text-xs text-gray-500 mt-2">在網頁顯示進出場 K 線圖。</p>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4 px-2">To Do</h3>
+                <div id="col-todo" class="kanban-col space-y-4">
+                    <div class="kanban-card border-l-4 border-blue-500">
+                        <span class="text-[10px] text-blue-400 font-bold">UI</span>
+                        <p class="text-sm font-bold mt-1">TradingView 圖表整合</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4 px-2">In Progress</h3>
+                <div id="col-progress" class="kanban-col space-y-4">
+                    <div class="kanban-card border-l-4 border-orange-500">
+                        <span class="text-[10px] text-orange-400 font-bold">SYS</span>
+                        <p class="text-sm font-bold mt-1">架構標準化整合</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4 px-2">Done</h3>
+                <div id="col-done" class="kanban-col space-y-4 opacity-60">
+                    <div class="kanban-card">
+                        <p class="text-sm font-bold line-through">DeepSeek 雙腦配置</p>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- In Progress -->
-        <div class="flex flex-col">
-            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
-                <i class="fas fa-spinner fa-spin mr-2 text-orange-500"></i> IN PROGRESS
-            </h2>
-            <div id="inprogress" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
-                <div class="card p-4 rounded-lg border-l-4 border-orange-500" data-id="kanban">
-                    <span class="text-[10px] text-orange-400 font-bold uppercase">Management</span>
-                    <h3 class="text-sm font-medium mt-1">互動看板開發 v1.1</h3>
-                    <p class="text-xs text-gray-400 mt-2">實現拖拽功能與持久化。</p>
-                </div>
-                <div class="card p-4 rounded-lg border-l-4 border-orange-500" data-id="report">
-                    <span class="text-[10px] text-green-400 font-bold uppercase">AI Analysis</span>
-                    <h3 class="text-sm font-medium mt-1">生成 1 月交易診斷報告</h3>
-                    <p class="text-xs text-gray-400 mt-2">阿里婆正在深入分析 673 筆數據。</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Done -->
-        <div class="flex flex-col">
-            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
-                <i class="fas fa-check-circle mr-2 text-green-500"></i> DONE
-            </h2>
-            <div id="done" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
-                <div class="card p-4 rounded-lg opacity-60" data-id="csv">
-                    <h3 class="text-sm font-medium line-through">解析 CSV 數據</h3>
-                </div>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script>
-        const columns = ['backlog', 'todo', 'inprogress', 'done'];
-        columns.forEach(id => {
+        const ids = ['col-backlog', 'col-todo', 'col-progress', 'col-done'];
+        ids.forEach(id => {
             new Sortable(document.getElementById(id), {
-                group: 'shared',
+                group: 'kanban',
                 animation: 150,
-                ghostClass: 'ghost-card',
-                onEnd: function() {
-                    console.log('排序已變動');
-                }
+                ghostClass: 'ghost-card'
             });
         });
-
-        function saveState() {
-            alert('排序已儲存！(目前暫存於頁面，未來將同步至 KANBAN.md)');
-        }
     </script>
 </body>
 </html>
