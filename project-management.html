@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beer & Aliple 互動看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .kanban-column { min-height: 70vh; transition: background 0.3s; }
+        .kanban-column:hover { background: rgba(59, 130, 246, 0.05); }
+        .card { cursor: grab; background: #1e2329; border: 1px solid #2d333b; }
+        .card:active { cursor: grabbing; }
+        .ghost-card { opacity: 0.4; background: #3b82f6 !important; }
+        body { background: #0b0e11; color: #e2e8f0; }
+    </style>
+</head>
+<body class="p-8">
+    <header class="mb-10 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-blue-400">Trading Journey 協作看板 <span class="text-xs font-normal text-gray-600 ml-2">v1.1 (Draggable)</span></h1>
+            <p class="text-gray-500 mt-2">點擊並拖拽任務卡片來調整優先級或進度</p>
+        </div>
+        <div class="flex space-x-4">
+            <span class="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs border border-green-500/20">阿里婆 正在分析報告...</span>
+            <button onclick="saveState()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-xs transition"><i class="fas fa-save mr-2"></i>保存排序</button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Backlog -->
+        <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
+                <i class="fas fa-lightbulb mr-2 text-yellow-500"></i> BACKLOG
+            </h2>
+            <div id="backlog" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
+                <div class="card p-4 rounded-lg shadow-lg" data-id="ocr">
+                    <span class="text-[10px] text-yellow-500 font-bold uppercase">AI Analysis</span>
+                    <h3 class="text-sm font-medium mt-1">OCR 截圖自動解析</h3>
+                    <p class="text-xs text-gray-500 mt-2">上傳截圖後自動識別 Setup 狀態。</p>
+                </div>
+                <div class="card p-4 rounded-lg shadow-lg" data-id="video">
+                    <span class="text-[10px] text-purple-500 font-bold uppercase">Video Edit</span>
+                    <h3 class="text-sm font-medium mt-1">自動剪輯精彩交易</h3>
+                    <p class="text-xs text-gray-500 mt-2">將大賺交易生成短影音素材。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- To Do -->
+        <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
+                <i class="fas fa-list-ul mr-2 text-blue-500"></i> TO DO
+            </h2>
+            <div id="todo" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
+                <div class="card p-4 rounded-lg border-l-4 border-blue-500" data-id="pnl">
+                    <span class="text-[10px] text-blue-400 font-bold uppercase">Data</span>
+                    <h3 class="text-sm font-medium mt-1">精確化 PnL 計算</h3>
+                    <p class="text-xs text-gray-500 mt-2">校準數據至 TradeZella 水平。</p>
+                </div>
+                <div class="card p-4 rounded-lg shadow-lg" data-id="chart">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">UI/UX</span>
+                    <h3 class="text-sm font-medium mt-1">整合 TradingView 圖表</h3>
+                    <p class="text-xs text-gray-500 mt-2">在網頁顯示進出場 K 線圖。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
+                <i class="fas fa-spinner fa-spin mr-2 text-orange-500"></i> IN PROGRESS
+            </h2>
+            <div id="inprogress" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
+                <div class="card p-4 rounded-lg border-l-4 border-orange-500" data-id="kanban">
+                    <span class="text-[10px] text-orange-400 font-bold uppercase">Management</span>
+                    <h3 class="text-sm font-medium mt-1">互動看板開發 v1.1</h3>
+                    <p class="text-xs text-gray-400 mt-2">實現拖拽功能與持久化。</p>
+                </div>
+                <div class="card p-4 rounded-lg border-l-4 border-orange-500" data-id="report">
+                    <span class="text-[10px] text-green-400 font-bold uppercase">AI Analysis</span>
+                    <h3 class="text-sm font-medium mt-1">生成 1 月交易診斷報告</h3>
+                    <p class="text-xs text-gray-400 mt-2">阿里婆正在深入分析 673 筆數據。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Done -->
+        <div class="flex flex-col">
+            <h2 class="text-sm font-semibold text-gray-400 mb-4 px-2 flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i> DONE
+            </h2>
+            <div id="done" class="kanban-column rounded-xl p-4 space-y-4 bg-gray-900/30">
+                <div class="card p-4 rounded-lg opacity-60" data-id="csv">
+                    <h3 class="text-sm font-medium line-through">解析 CSV 數據</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const columns = ['backlog', 'todo', 'inprogress', 'done'];
+        columns.forEach(id => {
+            new Sortable(document.getElementById(id), {
+                group: 'shared',
+                animation: 150,
+                ghostClass: 'ghost-card',
+                onEnd: function() {
+                    console.log('排序已變動');
+                }
+            });
+        });
+
+        function saveState() {
+            alert('排序已儲存！(目前暫存於頁面，未來將同步至 KANBAN.md)');
+        }
+    </script>
+</body>
+</html>
