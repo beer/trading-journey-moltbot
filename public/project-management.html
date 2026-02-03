@@ -74,7 +74,7 @@
 
     <script>
         async function fetchTasks() {
-            const res = await fetch('/api/tasks');
+            const res = await fetch('http://' + window.location.hostname + ':8080/api/tasks');
             const tasks = await res.json();
             ['backlog', 'todo', 'inprogress', 'done'].forEach(s => document.getElementById(s).innerHTML = '');
             tasks.forEach(t => {
