@@ -12,10 +12,10 @@
         body { background: #0b0e11; color: #e2e8f0; font-family: sans-serif; }
         .kanban-col { background: rgba(22, 26, 30, 0.5); min-height: 60vh; border-radius: 12px; padding: 15px; }
         .kanban-card { background: #1e2329; border: 1px solid #2d333b; padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: grab; position: relative; }
-        .kanban-card:active { cursor: grabbing; }
+        .kanban-card:hover { border-color: #3b82f6; }
         .ghost-card { opacity: 0.2; background: #3b82f6 !important; }
-        .delete-btn { position: absolute; top: 8px; right: 8px; opacity: 0; transition: opacity 0.2s; color: #4b5563; }
-        .kanban-card:hover .delete-btn { opacity: 1; }
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; opacity: 0; transition: opacity 0.2s; }
+        .kanban-card:hover .card-actions { opacity: 1; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -38,7 +38,7 @@
                     <img src="aliple.jpg" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover">
                     <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#161a1e] rounded-full animate-pulse"></span>
                 </div>
-                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">互動功能已修復!</p></div>
+                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">編輯功能已上線!</p></div>
             </div>
         </div>
     </aside>
@@ -59,13 +59,14 @@
 
     <!-- Modal -->
     <div id="taskModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-        <div class="bg-[#161a1e] p-8 rounded-2xl border border-gray-800 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-6 text-white">新增工作任務</h3>
+        <div class="bg-[#161a1e] p-8 rounded-2xl border border-gray-800 w-full max-w-md shadow-2xl">
+            <h3 id="modalTitle" class="text-xl font-bold mb-6 text-white">新增工作任務</h3>
+            <input type="hidden" id="editTaskId">
             <input type="text" id="taskTitle" placeholder="任務標題" class="w-full bg-[#0b0e11] border border-gray-700 rounded-lg p-3 mb-4 text-white outline-none focus:border-blue-500">
             <textarea id="taskDesc" placeholder="任務描述" class="w-full bg-[#0b0e11] border border-gray-700 rounded-lg p-3 mb-6 h-32 text-white outline-none focus:border-blue-500"></textarea>
             <div class="flex justify-end space-x-4">
                 <button onclick="closeModal()" class="text-gray-500 hover:text-white transition">取消</button>
-                <button onclick="addTask()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold text-white">創建</button>
+                <button onclick="saveTask()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-bold text-white">儲存</button>
             </div>
         </div>
     </div>
@@ -73,9 +74,8 @@
     <script>
         let tasks = JSON.parse(localStorage.getItem('crazy_kanban_tasks')) || [
             { id: 1, title: 'OCR 截圖解析', desc: '自動識別 Setup 狀態', status: 'backlog' },
-            { id: 2, title: '自動短片生成', desc: '生成交易短影音', status: 'backlog' },
             { id: 3, title: 'TradingView 整合', desc: '顯示 K 線圖', status: 'todo' },
-            { id: 4, title: '全站互動優化', desc: '修復拖拽與新增功能', status: 'inprogress' }
+            { id: 5, title: '資料庫自動同步', desc: '將 LocalStorage 同步到 SQLite', status: 'inprogress' }
         ];
 
         function renderTasks() {
@@ -87,46 +87,71 @@
                 card.innerHTML = `
                     <p class="text-sm font-bold text-gray-200">${t.title}</p>
                     <p class="text-[10px] text-gray-500 mt-1">${t.desc}</p>
-                    <button onclick="deleteTask(${t.id})" class="delete-btn hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    <div class="card-actions">
+                        <button onclick="editTask(${t.id})" class="text-blue-500 hover:text-blue-400"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteTask(${t.id})" class="text-gray-600 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
                 `;
                 document.getElementById(t.status).appendChild(card);
             });
             localStorage.setItem('crazy_kanban_tasks', JSON.stringify(tasks));
         }
 
-        function addTask() {
+        function saveTask() {
+            const id = document.getElementById('editTaskId').value;
             const title = document.getElementById('taskTitle').value;
             const desc = document.getElementById('taskDesc').value;
             if (!title) return;
-            tasks.push({ id: Date.now(), title, desc, status: 'backlog' });
+
+            if (id) {
+                // Update
+                const index = tasks.findIndex(t => t.id == id);
+                tasks[index].title = title;
+                tasks[index].desc = desc;
+            } else {
+                // New
+                tasks.push({ id: Date.now(), title, desc, status: 'backlog' });
+            }
             renderTasks();
             closeModal();
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskDesc').value = '';
+        }
+
+        function editTask(id) {
+            const task = tasks.find(t => t.id == id);
+            document.getElementById('editTaskId').value = task.id;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDesc').value = task.desc;
+            document.getElementById('modalTitle').textContent = '編輯工作任務';
+            openModal();
+        }
+
+        function openModal() {
+            if (!document.getElementById('editTaskId').value) {
+                document.getElementById('modalTitle').textContent = '新增工作任務';
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDesc').value = '';
+            }
+            document.getElementById('taskModal').classList.replace('hidden', 'flex');
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.replace('flex', 'hidden');
+            document.getElementById('editTaskId').value = '';
         }
 
         function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            renderTasks();
+            if (confirm('確定刪除？')) { tasks = tasks.filter(t => t.id !== id); renderTasks(); }
         }
-
-        function openModal() { document.getElementById('taskModal').classList.replace('hidden', 'flex'); }
-        function closeModal() { document.getElementById('taskModal').classList.replace('flex', 'hidden'); }
 
         const columns = ['backlog', 'todo', 'inprogress', 'done'];
         columns.forEach(id => {
             new Sortable(document.getElementById(id), {
-                group: 'tasks',
-                animation: 150,
-                ghostClass: 'ghost-card',
+                group: 'tasks', animation: 150, ghostClass: 'ghost-card',
                 onEnd: function(evt) {
                     const taskId = evt.item.dataset.id;
-                    const newStatus = evt.to.id;
                     const taskIndex = tasks.findIndex(t => t.id == taskId);
-                    if (taskIndex > -1) {
-                        tasks[taskIndex].status = newStatus;
-                        localStorage.setItem('crazy_kanban_tasks', JSON.stringify(tasks));
-                    }
+                    tasks[taskIndex].status = evt.to.id;
+                    localStorage.setItem('crazy_kanban_tasks', JSON.stringify(tasks));
                 }
             });
         });
