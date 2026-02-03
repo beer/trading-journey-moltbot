@@ -13,6 +13,11 @@
     </style>
 </head>
 <body class="bg-[#0b0e11] text-gray-200 font-sans leading-relaxed">
+    <script>
+        if (localStorage.getItem('trade_auth') !== 'authenticated') {
+            window.location.href = 'login.html';
+        }
+    </script>
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
