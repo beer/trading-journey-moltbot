@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beer's Crazy Money Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 TradingView Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script src="data.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .card-bg { background: #161a1e; border: 1px solid #2d333b; border-radius: 12px; }
         body { background: #0b0e11; color: #e2e8f0; font-family: sans-serif; }
-        /* RWD Mobile Hidden Sidebar */
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); transition: transform 0.3s; z-index: 50; }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; }
         }
     </style>
 </head>
@@ -25,10 +24,10 @@
     <!-- Mobile Header -->
     <div class="md:hidden bg-[#161a1e] p-4 flex justify-between items-center border-b border-gray-800">
         <h1 class="text-xl font-bold text-blue-400">Crazy Money</h1>
-        <button onclick="toggleSidebar()" class="text-white text-2xl"><i class="fas fa-bars"></i></button>
+        <button onclick="toggleSidebar()" class="text-white"><i class="fas fa-bars"></i></button>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (Standard Template) -->
     <aside id="sidebar" class="sidebar w-64 bg-[#161a1e] border-r border-gray-800 flex flex-col fixed inset-y-0 left-0 md:relative md:translate-x-0">
         <div class="p-6 border-b border-gray-800 hidden md:block">
             <h1 class="text-xl font-bold text-blue-400 flex items-center">
@@ -42,7 +41,7 @@
         <div class="p-6 border-t border-gray-800">
             <div class="flex items-center space-x-3">
                 <img src="aliple.jpg" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover">
-                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">RWD 模式已啟用</p></div>
+                <div class="text-[10px]"><p class="text-gray-500 font-bold uppercase">Aliple</p><p class="text-blue-400">TradingView 圖表已啟用</p></div>
             </div>
         </div>
     </aside>
@@ -51,36 +50,53 @@
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
             <div class="card-bg p-4 md:p-6">
-                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Net PnL</p>
-                <h2 class="text-xl md:text-2xl font-bold text-green-400" id="dispPnL">$0.00</h2>
+                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Total Net PnL</p>
+                <h2 class="text-xl md:text-2xl font-bold text-green-400" id="dispPnL">$7,588.74</h2>
             </div>
             <div class="card-bg p-4 md:p-6">
-                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Win Rate</p>
-                <h2 class="text-xl md:text-2xl font-bold text-white">40.4%</h2>
+                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Status</p>
+                <h2 class="text-xl md:text-2xl font-bold text-blue-400">Trading Live</h2>
             </div>
-            <!-- ... other KPIs ... -->
         </div>
 
+        <!-- TradingView Chart Section -->
         <div class="card-bg p-4 md:p-6 mb-8">
-            <h3 class="text-sm font-bold text-gray-400 mb-6">Equity Curve</h3>
-            <canvas id="equityChart" height="200" class="md:h-64"></canvas>
-        </div>
-
-        <div class="card-bg p-4 md:p-6">
-            <h3 class="text-sm font-bold text-gray-400 mb-6">Recent Activity</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <!-- ... table content ... -->
-                </table>
-            </div>
+            <h3 class="text-sm font-bold text-gray-400 mb-6 flex justify-between">
+                <span>Real-time Equity Analysis</span>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">BETA</span>
+            </h3>
+            <div id="chartContainer" class="w-full" style="height: 400px;"></div>
         </div>
     </main>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        window.onload = function() {
+            if (typeof tradeData !== 'undefined') {
+                const chart = LightweightCharts.createChart(document.getElementById('chartContainer'), {
+                    layout: { backgroundColor: '#161a1e', textColor: '#d1d4dc' },
+                    grid: { vertLines: { color: '#2d333b' }, horzLines: { color: '#2d333b' } },
+                    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+                    priceScale: { borderColor: '#2d333b' },
+                    timeScale: { borderColor: '#2d333b' },
+                });
+
+                const lineSeries = chart.addLineSeries({
+                    color: '#3b82f6',
+                    lineWidth: 3,
+                });
+
+                // 數據格式轉換
+                const formattedData = tradeData.map(d => ({
+                    time: Math.floor(new Date(d.t).getTime() / 1000),
+                    value: d.v
+                }));
+                
+                lineSeries.setData(formattedData);
+                chart.timeScale().fitContent();
+            }
         }
-        // ... Load Data & Chart JS ...
     </script>
 </body>
 </html>
